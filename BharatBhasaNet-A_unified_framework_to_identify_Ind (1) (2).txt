@@ -1,0 +1,998 @@
+﻿This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000.
+Digital Object Identifier 10.1109/ACCESS.2023.1120000
+
+BharatBhasaNet-A unified framework to identify
+Indian code mix Languages
+SAYANTAN DEY1, SHIVAM THAKUR2,AKHILESH KANDWAL 3, ROHIT KUMAR4, SHARMISTHA
+DASGUPTA 5, PARTHA PRATIM ROY6(Senior Member, IEEE).
+1Department of Computer Science & Engineering, Indian Institute of Technology Roorkee, Roorkee, Pin code-247667, India(e-mail: sayantan.cs@sric.iitr.ac.in)
+2Department of Computer Science & Engineering, Indian Institute of Technology Roorkee, Roorkee, Pin code-247667, India(e-mail: shivam_t@cs.iitr.ac.in)
+3Department of Computer Science & Engineering, Indian Institute of Technology Roorkee, Roorkee, Pin code-247667, India(e-mail:akhilesh.cs@sric.iitr.ac.in)
+4National Informatics Center, New Delhi(e-mail: rohit.k12@nic.in)
+5National Informatics Center, New Delhi(e-mail: sharmi@nic.in )
+6Department of Computer Science & Engineering, Indian Institute of Technology Roorkee, Roorkee, Pin code-247667, India(e-mail:partha@cs.iitr.ac.in )
+
+Corresponding author: Sayantan Dey (e-mail:sayantan.cs@sric.iitr.ac.in ).
+
+This work is funded by the National Informatics Center (NIC), operating under the Ministry of Electronics and Information Technology,
+Government of India
+
+ABSTRACT In the rapidly globalizing digital communication sphere, the imperative for advanced mul-
+tilingual text recognition and identification is increasingly evident. Contrasting the previous works, which
+were predominantly constrained to 2-3 languages, this paper explores the rich linguistic diversity of India, ad-
+dressing challenges in automated language processing for 12 languages. BharatBhasaNet, our comprehensive
+Language Identification (LID) framework, integrates an extensive dataset covering these 12 Indian languages
+in both native-script and romanized forms, derived from INDICCORP [30], Bhasha-Abhijnaanam [20],
+and Aksharantar [32] datasets by AI4Bharata. The framework accommodates two models, Roberta-native
+and Roberta-Romanized, based on attention mechanism and transformer architecture. With its exceptional
+accuracy of 99.54% in native script and 60.90% in Romanized text, BharatBhasaNet significantly advances
+language identification, providing broader language coverage than existing LIDs. It excels in interpreting
+code-mixed sentences , unveiling crucial accuracy patterns related to sentence length, word span, and
+complexity in multilingual contexts. The framework underwent rigorous testing using a real-time dataset
+from the National Informatics Center (NIC), achieving an accuracy rate of 92.67%. Overcoming challenges
+like limited training data and distinguishing similar languages, BharatBhasaNet marks a significant leap in
+Romanized text identification within diverse linguistic landscapes.
+
+ahttps://ai4bharat.iitm.ac.in
+
+INDEX TERMS Multilingual, Indian, Native, Romanized, Transformer, Attention, XLM-Roberta.
+
+I. INTRODUCTION stantial gap remains in the subtle recognition of languages,
+
+LANGUAGE. Identification (LID)plays a critical role in particularly in the detailed analysis of character and word
+the expansive field of computational linguistics, essen- level in code-mixed texts.
+
+tial for interpreting multilingual texts [5], [6]. This task as- To bridge these gaps, BharatBhasaNet is introduced as a
+sumes greater significance in today’s interconnected global pioneering framework in the LID domain. Unlike previous
+environment, particularly in linguistically diverse regions LID systems that are typically capable of managing only 2-3
+such as India, with its array of languages, scripts, and dialects languages, BharatBhasaNet is uniquely equipped to process
+[2], [3]. 12 Indian languages in native andRomanized scripts. A stand-
+
+Our study focuses on the challenges of multilingual text out feature of BharatBhasaNet is its proficiency in handling
+processing in India, addressing both native [7] and Ro- code-mixed sentences, blending native and Romanized lan-
+manized [8] languages. Prior research has explored various guages. It’s the first in its field to provide detailed analysis at
+methodologies, from traditional rule-based systems [9] to both the character and word levels, enabling a deeper under-
+modern machine learning techniques [10]. However, a sub- standing and more accurate identification of multilingual text
+
+VOLUME 11, 2023 1
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Dey et al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+complexities. Hindi, English, and various regional languages, reflecting
+BharatBhasaNet marks a milestone in LID technology. India’s multilingual nature of communication. Figure 2 shows
+
+As digital technologies, such as translation, ASR, and con- some examples of Code-mixed Sentences.
+versational interfaces, grow in importance [10], [12], [13], The challenge in mixed sentence identification arose from
+BharatBhasaNet emerges as a vital tool in creating resources the model’s tendency to provide monolingual results, espe-
+for less commonly spoken languages [11]. It effectively nav- ciallywhen confrontedwith code-mixed sentences containing
+igates challenges such as web data noise, sparse datasets English, Hindi, and regional languages. A shift was made to
+[12], and similarities among high-resource languages [14]. address this challenge from sentence to word-wise identifica-
+Existing LID tools, though valuable, fall short in the intricate tion. By focusing on individual words within the code-mixed
+and diverse Indian language landscape, particularly in the sentences—containing English, Hindi, regional languages in
+nuanced handling of code-mixed sentences. native scripts, and English, Hindi, and regional languages
+
+Empowered by advanced machine learning models like in Romanized English script—the aim was to mitigate the
+Transformer Networks and the Roberta model [18]–[20], model’s inclination toward predicting the entire code-mixed
+BharatBhasaNet excels in identifying complex linguistic pat- sentence as a single language, enabling more accurate lan-
+terns in Indian languages [19]. The Transformer networks’ guage identification at a word level.
+capability to capture long-range dependencies [21] and the
+contextual sophistication of the Roberta model [18], [22] are
+instrumental in BharatBhasaNet’s success. Its strength lies
+in its unparalleled proficiency in dissecting complex code-
+mixed sentences at both the character and word levels, setting
+a new standard in LID.
+
+Native Indian Language identification:In this multi-
+class classification task focusing on identifying 12 distinct
+native Indian languages from provided text samples, each
+language is assigned a specific label (e.g., Bengali as 1,
+Assamese as 2, up to Punjabi as 12). The primary goal is FIGURE 2. Code Mixed Indian Native and Romanized Language Sentences
+to accurately categorize input text into one of these 12 cat- Examples: (a) Sentence with languages: [1] Native Punjabi and [2] Native
+
+Assamese, (b) Sentence with languages: [1] Native Malayalam and [2]
+egories, effectively recognizing the language it represents. Native Gujarati, (c) Sentence with languages: [1] English, [2] Romanized
+For instance, the successful classification of the input text Hindi, [3] Native Hindi and [4] Native Bangla, (d) Sentence with
+
+languages: [1] Romanized Tamil and [2] Romanized Kannada, (d)
+’Hello, I am well’ as ’English’ showcases the model’s ability Sentence with languages: [1] Romanized Telugu and [2] Romanized Oriya
+to identify English among 12 native Indian languages. The
+Figure 1(a) displays examples of Native Languages. In this paper, the integration of advanced BERT models
+
+is investigated to enhance the accuracy and robustness of
+multilingual text recognition and identification systems ex-
+plicitly tailored for Indian languages. Our research explores
+this approach’s implications, elucidating its potential benefits
+to multilingual text recognition and identification systems,
+specifically focusing on Indian languages. The paper provides
+
+(a) (b) a detailed analysis of themethods employed and the empirical
+findings, shedding light on the effectiveness and adaptability
+
+FIGURE 1. (a) Native Indian Languages, (b) Romanized Indian Languages of these advanced models within this multilingual context.
+The contributions of this paper are as follows:
+
+Romanized Indian Language identification: This multi- 1) Introduction of a robust methodology: Our paper
+class classification task focuses on identifying 12 distinct introduces a comprehensive and robust methodology
+Romanized Indian languages from provided text samples. meticulously designed to confront and overcome the
+Each language receives a specific label (e.g., Bengali as 1, As- inherent challenges prevalent in language identification
+samese as 2, up to Punjabi as 12). The main aim is to identify across these 12 languages. This methodological frame-
+all the 12 Romanized Indian languages. For example, "Ami work is a cornerstone, offering a solid and adaptable
+bhalo achi" is classified as "Bengali in English Script." Figure foundation for addressingmultifaceted language recog-
+1(b) displays examples of Romanized Indian Languages nition obstacles.
+
+Code Mixed Sentences Identification:In our work, em- 2) Comprehensive analysis at word and character lev-
+phasis is placed on the identification of languages within els: Through a meticulous examination conducted at
+code-mixed sentences. Code-mixed sentences in Indian na- both word and character levels, our study unveiled in-
+tive and Romanized languages are a linguistic phenomenon valuable insights into the complexities inherent in mul-
+that blends multiple languages within a single utterance or tilingual text recognition across the spectrum of these
+text. These sentences seamlessly intertwine languages like 12 languages. This exhaustive analysis substantially
+
+2 VOLUME 11, 2023
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Deyet al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+enhances our understanding of the intricacies of lan- els faced issues related to semantics and out-of-vocabulary
+guage variation and expression within diverse linguistic terms, partially mitigated by the bi-gram model. Traditional
+contexts. techniques assign equal importance to all words in a sen-
+
+3) Extensive experimentation and verification: Rigor- tence or document, lacking discrimination in word relevance.
+ous experimentation and validation procedures were However, TF-IDF [28] addresses this by accentuating the
+meticulously carried out to thoroughly test and af- significance of specific words, elevating the importance of
+firm the efficiency and reliability of our proposed ap- those deemed most significant while diminishing the weights
+proach. The framework was rigorously tested on a real- of commonly occurring terms through IDF. Nevertheless,
+time dataset. The extensive experimentation conducted despite its efforts to prioritize certain words, the TF-IDF
+serves as a testament to the effectiveness and robustness feature extraction method grapples with the challenge of out-
+of our methodology in accurately identifying and pro- of-vocabulary terms.
+cessing multilingual text, thereby validating its practi- The Introduction of a Bidirectional Long Short-Term
+cal utility. Memory (BLSTM)model [29] for Hindi-English code-mixed
+
+The rest of this paper can be sorted as follows: Section II data proved insightful, employing word embeddings for En-
+discusses the related woodworker Multilingual text recogni- glish and character-based embeddings for Hindi Romanized
+tion for 12 Indian languages. III of this paper talks about the words, showing promising outcomes at the word level. For
+data set and experiments. IV discusses themethodology of the generating these word embeddings, the Word2Vec package
+proposed pipeline. V presents the experiments and discussion. was used, followed by the skip-gram technique.1-gram, 3-
+VI discusses the errors in identifying code-mixed languages. gram, and 5-gram embedding types were used for the clas-
+Limitations of the study are given in VII The paper concluded sification of English, Hindi, and Named Entity. The model
+with a detailed conclusion VIII of the paper and future scope. could capture the semantic meaning of long sequences. How-
+
+ever, the applicability of this model was confined to Hindi
+II. RELATED WORK Romanized and English words. In the context of Malayalam-
+In the initial stages of language identification tasks, a bi- English code mixed data [20], researchers extensively em-
+nary feature technique based on word and character co- ployed BERT models and fine-tuned these models using a
+occurrences was utilized to identify 25 Latin alphabet-based data set comprising 50 thousand code-mixed samples. How-
+languages [23]. Subsequently, an n-gram model [23] was ever, the studies were limited in their scope, lacking thor-
+introduced, which focused on sequences of characters to ough comparisons with alternative machine learning or deep
+classify different languages in a document. Previous advance- learningmodels. These studies predominantly leaned towards
+ments in the code mixed language identification field have transformer-based methodologies without broader compara-
+shown progress in language identification primarily centered tive analyses with other model frameworks.
+around two languages. Code mixing is of three types [24].
+The first is inter-sentential code, where one sentence is of one III. DATASET AND EXPERIMENTAL SETUP
+language, and the other is of another. The second one is intra- For this study, a diverse dataset encompassing a representative
+sentential code, where many languages are between single sample of Indian languages was curated. For the identifica-
+sentences, which means there is a switching between lan- tion of Indian languages, there is a dataset IndicCorp [30]
+guages within the same sentence. The third one is word-level in the AI4BHARAT research lab introduced by IIT Madras
+code, where switching happens within words. For English- to make research possible in the field of Indian languages.
+Bodo code-mixed text classification sourced from Facebook, The Dataset comprises text documents spanning multiple do-
+Decision Trees, Naive Bayes, and Multi-Layer Perceptron mains, including news articles, literature, social media posts,
+models were employed [25]. and official documents, to evaluate the proposed methods
+
+There was a code mix tag set using an acronym, Uni- comprehensively. It covers languages like Hindi, Bengali,
+versal, Named Entity, Undefined, and Word Mix other than Tamil, Telugu, Marathi, Gujarati, Punjabi, and more, each
+English and Bodo. Language identification with the use of presenting distinct linguistic characteristics and challenges.
+machine learning classifiers was dominant. The author used A series of experiments were conducted on the curated
+n-gram and dictionary-based features. However, these meth- Dataset to assess the effectiveness of the proposed approach.
+ods showed limitations in understanding and addressing mul- The experiments evaluated language recognition accuracy
+tilingual complexities in context. Similarly, in the context of and the model’s ability to handle code-switching scenarios
+English-Kannada [26] code-mixed sentences, Support Vector where multiple languages are intermingled within a single
+Machine, Naive Bayes, and Random Forest classifiers were text.
+used, accompanied by TF-IDF and Bag of Words feature The RoBERTa model, pre-trained on a large multilin-
+extraction methods. Bag of words [27] represented the text gual corpus, was fine-tuned on the Dataset using a cross-
+unorderedwithout seeing their grammar. In a bag of words, all entropy loss function. To ensure optimal convergence and
+the unique words are put together and make the vocabulary, performance, dedicated attention was given to configuring the
+and each sentence or document will get a unique vector in model’s hyper-parameters, including learning rate, batch size,
+terms of word frequency. Nonetheless, Bag of Words mod- and training epochs.
+
+VOLUME 11, 2023 3
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Dey et al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+Traditional machine learning models, including Support exported to a CSV file. This meticulous process aimed to
+Vector Machines (SVMs), were also used to establish a base- clean and organize the textual data, preparing it for training,
+line for comparison. These models were trained on engi- comprising 600,000 (50,000 sentences per language) lines
+neered features like character n-grams, frequency distribu- for training and 360,000 (30,000 sentences per language) for
+tions, and linguistic rules. testing.
+
+The evaluation process involved random sampling of the
+Dataset into training, validation, and test sets, maintaining
+language distribution proportions. Precision, recall, F1-score,
+and accuracy were used as performance metrics, and detailed
+error analysis was conducted to understand the specific chal-
+lenges faced by the models, such as misclassification due to
+phonetic similarities and font variations.
+
+By conducting rigorous experiments and comparisons, this
+study seeks to elucidate the efficacy of utilizing advanced
+language models like Roberta in enhancing multilingual text
+recognition and identification systems, especially within the
+context of the intricate linguistic landscape presented by In- FIGURE 4. Native Indian language sample sentences before and after
+
+pre-processing. Red text indicates eliminated numbers and special
+dian languages. characters.
+
+A. NATIVE TRAINING AND TESTING DATASET
+The native training and testing set was made from the IN- B. ROMANIZED TRAINING AND TESTING DATASET
+DICCORP [30] dataset in AI4bharat. It consists of 12 Indian To obtain the romanized data, information was sourced from
+languages. The Number of training sentences and Number of two datasets: Bhasha-Abhijnaanam [20] andAksharantar [32]
+testing sentences for each Native language are presented in from the AI4Bharat website. These datasets consist of sen-
+Figure 3. tences or words originally scripted in various Indian lan-
+
+guages, transliterated into the English script, also known as
+the Romanized script. Details regarding theNumber of testing
+sentences available for each native language are presented in
+Figure 5.
+
+FIGURE 3. Number of sentences in 12 Native Indian Languages,
+categorized by training (blue) and testing (orange) sets. The dataset
+contains 50,000 training and 30,000 testing sentences for each language.
+
+Preprocessing: The textual files from the IndicCorp dataset FIGURE 5. Number of sentences in 12 Romanized Indian Languages,
+underwent processing, including removing memorable char- categorized by training (blue) and testing (orange) sets.
+acters, numbers, and punctuation from the sentences. Exam-
+ples of sample sentences are shown in Figure 4. The Indian Preprocessing Romanized Dataset: Data from various lan-
+native language filtered data was structured as "Sentences" guages sourced from Aksharantar (Test and Train files) and
+and "Language", each represented by a specific numeric code the Abhijanam dataset were used for training purposes. Sub-
+ranging from 1 to 12. For languages other than English, sequently, this data was processed, including the removal of
+English characters were excluded. Following this, rows with memorable characters, numbers, and punctuation from the
+missing values were removed, and the cleaned Dataset was sentences, and amalgamated into a unified file. For testing
+
+4 VOLUME 11, 2023
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Deyet al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+purposes, the Aksharantar (Valid) dataset was exclusively semantic nuances within sentences. It identifies individual
+employed. Following this consolidation, the training and test- words’ varying roles in conveying the overall semantic mean-
+ing Data Frames were augmented by introducing "Sentence" ing. This process is facilitated by three critical components
+columns, paired with corresponding "Language" columns derived from input embeddings: the Query (Q), Key (K), and
+containing singular word values Value (V) matrices. The Query matrix pinpoints the word
+
+under consideration, the Key matrix evaluates its relevance
+C. REAL TESTING DATASET across the input sequence, and the Value matrix contains
+In addition to the datasets sourced from AI4Bharat, a testing the information to be extracted based on this determined
+dataset provided by the National Informatics Centre (NIC) relevance.
+was also incorporated to evaluate the reliability and suitability The mechanism initiates with a score calculation, denoted
+model for real-world applications. A significant portion of by (1). This step quantifies each key’s relevance to the query,
+the dataset is comprised of sentences that are either written essentially deciding how much attention should be given to
+entirely in English or solely in native regional scripts. Another different parts of the input for a specific word or token. A
+subset of the dataset contains mixed-language sentences, critical aspect of this process is using a scaling factor related
+which feature a combination of English and regional language to the dimension of the key vectors. This scaling is essential
+elements. Additionally, a portion of the dataset also includes to prevent minimal gradients during training, a potential is-
+sentences written in a combination of English and Romanized sue when passing through the softmax function. It ensures
+scripts of regional languages. This dataset comprises approx- balanced gradients, thereby facilitating stable and practical
+imately 1,600,000 sentences, encompassing a diverse range learning.
+of linguistic compositions. Subsequently, a softmax normalization is applied. This step
+
+converts the relevance scores into a probability√distribution,
+IV. METHODOLOGY guaranteeing that they collectively sum up to 1. dk A scal-
+A. TOKENIZATION ing factor used to stabilize the gradients during the training
+Our study delves into the examination of Roberta, a signifi- process. It’s the square root of the dimensionality of the keys
+cant variant of BERT, renowned for its utilization of the Byte dk .
+Pair Encoding (BPE) technique for subword tokenization. The resulting probabilities are then used in the Value ma-
+Two widely recognized methods, Word Piece and Byte Pair trix(2), culminating in the final output of the attention mech-
+Encoding, stand out in subword tokenization. Word Piece, anism.
+as detailed in [33], disassembles words within a sentence The attention mechanism’s ability to dynamically adjust
+into smaller units called word pieces, accompanied by adding focus on various parts of the input sequence, as informed by
+special boundary symbols, effectively addressing ambiguities the interplay of the Query, Key, and Value matrices, is critical
+in language. Conversely, Byte Pair Encoding (BPE), as de- to its effectiveness. This dynamic focusing is essential for ac-
+scribed in [34], dissects words into smaller subword units curately capturing contextual nuances in language, allowing
+by replacing frequent byte sequence pairs with previously transformer models to excel in complex language processing
+unused byte sequences. This methodology holds particular tasks.
+advantages, especially for languages like those prevalent in Score(Q,K) = Q(K
+
+T
+
+) (1)
+India, characterized by complex morphological structures
+and agglutinating traits. By segmenting words into subword Scor
+
+Attention(Q,K ,V ) = softmax √e(Q,K)
+V (2)
+
+units, BPE offers a refined approach to a text representation, dk
+enabling models like Roberta to gain a more intricate and
+nuanced understanding of these complicated linguistic struc- C. TRANSFORMER NETWORKS
+tures. In contrast, Sentence Piecemodels, which function sim- Transformers, introduced in the landmark paper "Attention
+ilarly toWord Piece, have gained attention for efficiently han- Is All You Need" [35], have revolutionized natural language
+dling subword tokenization tasks, particularly in languages processing (NLP) bymoving away from traditional sequential
+with complex morphology and agglutinating features. data processing. Instead, they utilize self-attention mecha-
+
+nisms that allow for parallel processing of input data, adeptly
+B. ATTENTION MECHANISM capturing relationships between words regardless of their
+The attention mechanism, a cornerstone in transformer model positions within the text. This architectural innovation shown
+architectures, is pivotal in determining the relevance of words in Figure 6 comprises two core components: an encoder and a
+in a sequence. It enables the model to focus on significant decoder, each consisting of layers incorporating self-attention
+words while minimizing the impact of less relevant ones. This and feed-forward neural networks.
+functionality is particularly crucial in Natural Language Pro- At the heart of the Transformer’s functionality is its self-
+cessing (NLP), where it has been instrumental in enhancing attention mechanism. This process involves computing the
+the performance of transformer-based models. significance of each word relative to others within a sentence,
+
+In text classification, especially in models like Roberta, enabling the generation of context-aware embeddings using
+the attention mechanism is employed to extract and analyze equations (1) and (2). The encoder and decoder structure of
+
+VOLUME 11, 2023 5
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Dey et al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+the Transformer further enhances this mechanism. Follow-
+ing a specific layer normalization(LayerNorm) and sublayer
+function (3), each encoder layer includes a multi-head self-
+attention mechanism and a fully connected feed-forward net-
+work. The decoder mirrors this structure with an added layer
+for multi-head attention over the encoder’s output(4), facil-
+itating a complex encoding-decoding process that captures
+extensive dependencies and contextual information.
+
+A critical aspect of the Transformer is its multi-head atten-
+tion mechanism (5) (6). head1, . . . , headh : These represent
+individual attention heads, where h is the number of attention
+heads. Each attention head performs its own attention com-
+putation. The output weight matrix WO, is used to linearly
+transform the concatenated output of the attention heads to
+match the desired output dimensionality.WQ
+
+i ,W
+K
+i ,W V
+
+i : The
+weight matrices WQ
+
+i ,W
+K
+i ,W V
+
+i : specific to the ith attention
+head, used to linearly transform the query, key, and value ma-
+trices, respectively.Attention(QWQ
+
+i ,KW
+K
+i ,VW V
+
+i ) : Denotes
+the attention mechanism applied to the transformed query,
+key, and value matrices corresponding to the ith head.
+This feature enables the model to attend to different seg- FIGURE 6. The Transformer architecture consisting of the Encoder and
+
+ments of the input sequence concurrently, processing infor- Decoder blocks
+
+mation from various representational subspaces. This multi-
+head approach is instrumental in the Transformer’s ability
+to understand and interpret complex linguistic patterns. In adept at various natural language processing tasks. Roberta’s
+
+conclusion, the mathematical formulations underlying Trans- advancements have cemented its role as a highly effective tool
+
+former networks, especially the self-attention mechanism and in NLP, excelling in tasks ranging from sentiment analysis to
+
+the encoder-decoder architecture, are critical to their effec- complex question-answering and setting new benchmarks in
+
+tiveness in diverse NLP tasks. Their proficiency in handling language processing capabilities.
+
+tasks like machine translation, text generation, and sentiment Further augmenting its capabilities, Roberta’s advanced
+analysis is attributed mainly to their capability to manage training approach allows for more nuanced and accurate lan-
+long-range dependencies and contextual nuances in text se- guage interpretations, significantly improving task-specific
+quences. applications. It demonstrates exceptional proficiency in un-
+
+LayerNorm(x + Sublayer(x)) (3) derstanding context, subtlety, and the complexities of dif-
+ferent languages, which is vital in the ever-expanding realm
+
+DecoderLayerOutput = LayerNorm(x+
+(4) of NLP. This adaptability and depth of understanding make
+
+MultiHeadAttention(x, EncoderOutput)) RoBERTa not just an evolution of BERT but a transforma-
+MultiHead(Q,K ,V ) = Concat(head1, . . . , headh)W
+
+O (5) tive model that pushes the boundaries of what’s possible in
+language understanding and text analysis. Its success under-
+
+where headi = Attention(QWQ
+i ,KW
+
+K
+i ,VW
+
+V
+i ) (6) scores the importance of extensive pre-training in developing
+
+models that can effectively navigate the nuances of human
+D. ROBERTA MODEL language.
+Roberta, standing for "A Robustly Optimized BERT Pre-
+training Approach" [36], is a state-of-the-art language rep- E. FINE TUNING XLM ROBERTA
+resentation model that represents a significant enhancement In this section, the fine-tuning of the XLM-RoBERTa model,
+over its predecessor, BERT (Bidirectional Encoder Repre- a prominent pre-trained language model, for the specific
+sentations from Transformers). Developed by Facebook AI, application of language detection is detailed. Our objective
+Roberta refines BERT’s architecture by undergoing an exten- is to refine a robust and precise model that can effectively
+sive pre-training process on a substantially larger dataset and differentiate between multiple languages within a text, a task
+for a longer duration. This comprehensive training enables of increasing relevance in the diverse linguistic landscape of
+the model to handle diverse languages and tasks, producing today’s digital content.
+deeply contextualized embeddings capable of capturing in- Our model’s development, training, and evaluation stages
+tricate syntactic and semantic patterns in text. The key to were streamlined by employing the Hugging Face Trans-
+Roberta’s enhanced performance lies in this extended pre- formers library, renowned for its efficiency and versatility in
+training phase, which equips it with a more profound un- NLP tasks. The dataset, a critical component of our research,
+derstanding of language structures, making it exceptionally was derived from a comprehensive CSV file. Before train-
+
+6 VOLUME 11, 2023
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Deyet al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+ing, meticulous pre-processing of this data was addressed, integrating beam search with the RoBERTa model output,
+addressing missing values and implementing a robust tok- accurate prediction of language sequences within multilin-
+enization process to adapt the textual data for our model’s gual texts could be achieved. This methodology significantly
+consumption. boosted the efficacy of our language detection model, demon-
+
+A distinctive aspect of our methodology is adopting a strating the potency of combining advanced NLP techniques
+custom metric, ’compute metrics,’ designed to assess the with optimized search algorithms in addressing intricate lan-
+model’s performance with a focus on accuracy and F1-score. guage processing tasks.
+This dual-metric approach provides a balanced evaluation,
+capturing the model’s precision and recall capabilities. Score(Yt−1, yt) = Score(Yt−1) + log P(yt |Yt−1) (7)
+
+The fine-tuning process was conducted over multiple
+epochs, precisely ten, with a carefully selected adjustable Yt = topb(Score(Yt−1, yt)) (8)
+learning rate of 2e-5. This choice of learning rate, along
+with the optimization of batch sizes to 1280 for training G. PROPOSED PIPELINE
+and 2560 for evaluation, was instrumental in achieving the Two models, Roberta Native, and Roberta Romanized, were
+desiredmodel efficiency. Incorporating dynamic padding was introduced, as outlined in Figure 7, to address the challenge
+another critical strategy, allowing for efficient handling of of identifying code-mixed sentences comprising multiple lan-
+texts of varying lengths. guages. Initially, the Roberta Native model classified words
+
+Our training approach was further enhanced using mixed- in a sentence into categories such as English, Hindi, or any
+precision training (FP16), significantly accelerating the pro- regional language. However, an issue arose where Romanized
+cess by leveraging GPU capabilities. This improvement not words within mixed sentences were often declassified as
+only increased training efficiency but also contributed to the "English." To mitigate this problem, the Roberta Romanized
+scalability of our model training. model was introduced. This specialized model focused on
+
+reclassifying Romanized words previously labeled as "En-
+F. BEAM SEARCH glish." It differentiated between "True English," "Roman-
+In our research, beam search was effectively implemented to ized Hindi," and "Regional Romanized" words, subsequently
+extract the most probable language sequence from the word- transliterating the latter two categories into separate Hindi and
+wise language probability values provided by the RoBERTa Regional Native Words. The sentence was reconstructed by
+model. Beam search, renowned for its efficiency in sequence retrieving the stored indices of Hindi words, Regional native
+prediction tasks, particularly excels in scenarios with an ex- words, transliterated Hindi words, and regional words. The
+tensive output space. This heuristic algorithm distinguishes Roberta Native model was then re-applied to classify "True
+itself from traditional search methods by limiting the expan- Hindi," "True English," and "True Regional" words. The
+sion of nodes at each level, a constraint determined by the pipeline constructed language sequences for mixed sentences
+beam width, denoted as (b). The process commences with the through a beam search process detailed in Figure 8.
+initial expansion of nodes, followed by a scoring phase as in
+equation (7) based on the language probabilities output by the
+RoBERTa model. In (7), the score Score(Yt−1, yt) represents
+the likelihood of extending the partial sequence Yt−1 with
+the next token yt , computed as the sum of the score of Yt−1
+and the logarithm of the conditional probability P(yt |Yt−1).
+Crucially, at each level of expansion, the algorithm retains
+only the top b nodes with the highest scores for further
+consideration.
+
+This selection process is governed by a specific mathemat-
+ical formula (8). This process helps to assess the probability
+of each potential extension to the sequence. In (8), the set
+Yt consists of the b most probable partial sequences at time FIGURE 7. BharatBhasaNet efficiently deciphers code-mixed sentences in
+
+step t , determined by selecting the top b sequences based on 12 Indian languages using a streamlined two-model approach. Initially,
+the Roberta Native model classifies each word as English, Hindi, or a
+
+their scores according to Score(Yt−1, yt). The beam search regional language. For Romanized words often mislabeled as English, the
+algorithm efficiently explores the space of possible sequences Roberta Romanized model intervenes, accurately differentiating between
+
+true English and Romanized Indian languages. This is followed by a
+by considering multiple candidate sequences simultaneously transliteration of Romanized words into their native scripts and a
+and selecting the most promising ones for further exploration meticulous reconstruction of the sentence. The process concludes with a
+
+final application of the Roberta Native model, ensuring precise language
+in the decoding process. Such a strategic approach balances identification, adeptly revealing the complexities of code-mixing in
+computational efficiency and accuracy in predicting language multilingual texts.
+
+sequences. The algorithm concludes its operation upon meet-
+ing a predetermined condition, like reaching themaximum se-
+quence length or encountering an end-of-sequence marker.By V. EXPERIMENT AND DISCUSSION
+
+VOLUME 11, 2023 7
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Dey et al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+sifiers. To convert textual data into numerical representa-
+tions for both Native and Romanized cases, feature extraction
+methods such as Count Vectorizer and TF-IDF Vectorizer
+were employed. For the SVM classifier in the Native results,
+the Count Vectorizer feature extraction method was utilized,
+and a Stratified K-Fold validation approach with k=10 was
+implemented. Additionally, with the TF-IDF feature extrac-
+tion, GridSearchCV was employed to select the optimal pa-
+rameter for tuning
+Regarding the Romanized results in both SVM and XLM-
+
+Roberta, detailed in Table 2, Count Vectorizer was exclusively
+employed without using validation approaches.
+Similarly, TF-IDFwas utilizedwithout GridSearchCV.No-
+
+tably, the XLM-Roberta model for Romanized text exhibited
+superior performance across all evaluation metrics compared
+to the SVM-based approach for Romanized text.
+
+TABLE 1. Performance Comparison of XLM-Roberta Native Model and
+SVM Native Classifiers with Feature Extraction Methods
+
+Model Testing P R F1 Acc
+data
+
+SVM 360000 96.93 96.55 96.65 96.54
+Native+Count
+Vectorizer
+SVM Native+TF- 360000 97.41 97.35 97.35 97.35
+IDF Vectorizer
+XLM ROBERTA 360000 99.55 99.54 99.54 99.54
+Native
+
+FIGURE 8. Detailed overview of a code-mixed 12 languages identification TABLE 2. Performance Comparison of XLM-Roberta Romanized Model
+of a novel pipeline. Input sample with mixed code of Native and and SVM Romanized Classifiers with Feature Extraction Methods
+Romanized sentences: red (English), green (Hindi Romanized), blue (Hindi
+native), and pink (Bengali native) highlight specific language components.
+Output includes the final transliterated sentence in their native language: Model Testing P R F1 Acc
+red (English native), green (Hindi native), and pink (Bengali native) data
+denote respective language components. Language classification tags SVM Romanized 94600 42.96 21.82 17.78 21.82
+(yellow) accompany the output, providing insights into the identified XLM ROBERTA 94600 63.90 60.90 61.31 60.90
+code-mixed languages. Romanized
+
+A. RESULT ANALYSIS 1) XLM ROBERTA Native Word Wise confusion analysis
+XLM-Roberta pre-trainedmodel initially trained on 2.5 TB of The word-wise confusion matrix for XLM ROBERTa is
+filtered Common Crawl data spanning 100 languages is uti- shown in Figure 9(a), Figure 9(b).In the figure, the 2-word
+lized. This variant of ROBERTa, known as XLM-ROBERTa, and 3-word confusion matrices are observed. A significant
+is amultilingualmodel boasting 125million parameters, 3072 confusion is noted between Bengali-Assamese, Hindi, and
+feed-forward hidden states, 768 hidden states, 12 layers in Marathi languages. The representation of labels is defined
+the transformer blocks, and eight self-attention heads. The in the form of languages in the table. The accuracy of 2
+Adam optimizer and the GELU (Gaussian Error Linear Unit) and 3 words was tested, and after the analysis, individual
+activation function were employed for our experiments. All testing accuracy for Bengali, Marathi, and Hindi in confusion
+experiments used a CPU - Intel i7 12th Gen @ 2.70GHz, 128 matrices increased. This relationship is presented in Figure
+GB RAM, and an NVIDIA 3090 TI graphics card with 24 10.
+GBmemory. The results obtained from these experiments are Two-word and three-word confusion matrices were ana-
+detailed in the subsequent sections. lyzed in the SVM and Count Vectorizer feature extraction
+
+method. These matrices illustrate a notable pattern of con-
+B. XLM ROBERTA VS SVM fusion, particularly between Bengali-Assamese, Hindi, and
+The performance comparison between the XLM-Roberta Na- Marathi languages. However, a different feature extraction
+tive Model and SVM Native classifiers is outlined in Table 1. TF-IDF feature extraction method is used. In that case, there
+Notably, in the case of native scripts, the XLM-Roberta model is a common confusion between Telugu and any Indian Lan-
+demonstrated superior results compared to SVM-based clas- guage. However, the confusion percentage decreases for the
+
+8 VOLUME 11, 2023
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Deyet al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+Telugu language and for both feature extraction methods as The intricate linguistic similarities posed challenges for ac-
+the words increase, and the confusion percentage decreases curate label predictions, further highlighting the complexities
+for other languages. of language identification in this shared script context.
+
+(a) (b)
+
+FIGURE 9. Comparision of Confusion matrices for XLM ROBERTA native:
+(a) 2 words confusion matrix for XLM ROBERTA native, (b) 3 words
+confusion matrix for XLM ROBERTA native
+
+FIGURE 11. Relationship between the number of characters and their
+corresponding accuracy values. The figure provides insights into the
+performance metrics associated with different character lengths.
+
+(a) (b)
+
+FIGURE 10. Comparison of Word Wise Accuracy across various Native
+Indian Languages. The x-axis indicates different language labels, and the
+y-axis represents accuracy. Blue bars denote accuracy for 2-word
+sequences, while orange bars represent accuracy for 3-word sequences.
+
+2) XLM ROBERTa Base Native Character Wise confusion
+analysis
+Individual testing sets for 3,4,5,6,7, and 8 characters were (c) (d)
+
+made. The results for each character are presented in Figure FIGURE 12. (Characters-wise confusion matrices for the XLM-Roberta
+11. The characters-wise confusion matrix for XLM Roberta model. Subfigures (a), (b), (c), and (d) illustrate the confusion matrices for
+is shown in Figure 12(a), Figure 12(b), Figure 12(c), and different character lengths, specifically, 5 characters, 6 characters, 7
+
+characters, and 8 characters, providing a detailed comparison of model
+Figure 12(d). Upon examining the 5,6,7,8-char sequence con- performance across varying character lengths.
+fusion matrix distinct patterns emerged in testing accuracy.
+Marathi’s testing accuracy displayed an increasing trend with
+the growth in the Number of characters, while Hindi words 3) XLM ROBERTa Romanized vs SVM Romanized Analysis
+exhibited a decrease in testing accuracy, indicating misinter- The confusion matrix and classification for both XLM
+pretation of Hindi words. This decline is particularly note- Roberta Romanized and SVM Romanized are shown in Fig-
+worthy given the substantial word overlap between these two ure 13(a), 13(b),14(a) and 14(b). XLM Roberta Romanized
+languages, as both languages share almost the same script. performed better results compared to SVM Romanized. The
+
+VOLUME 11, 2023 9
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Dey et al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+F1 score of XLM Roberta Romanized for all 12 Indian lan- model exhibited a higher confusion rate between Bengali
+guages is higher than SVM Romanized. and Assamese languages and between Hindi and Marathi as
+
+shown in Figure 15. This section delves into analyzing these
+errors, exploring the underlying reasons and their implica-
+tions on the model’s performance.
+Bengali and Assamese: The confusion between Bengali
+
+and Assamese can be attributed to their linguistic similarities.
+Both languages share a significant number of common words
+and have similar grammatical structures stemming from their
+common origin in the Indo-Aryan language family. Further-
+more, their distinct scripts bear a resemblance that can lead
+to misclassification by the model, especially in shorter texts
+where contextual cues are limited.
+Hindi and Marathi: Similarly, the model’s difficulty dis-
+
+(a) (b)
+tinguishing between Hindi and Marathi arises from their
+
+FIGURE 13. Confusion matrices for the Romanized testing sets. Subfigure close linguistic relationship as members of the Indo-Aryan
+(a) illustrates the confusion matrix for the XLM-Roberta Romanized
+testing set, while subfigure (b) showcases the confusion matrix for the language group. Hindi and Marathi have overlapping vocab-
+SVM Romanized testing set ularies and similar syntactic patterns. The scripts of both
+
+languages, Devanagari, are identical, adding another layer of
+complexity to the language detection task.
+Impact on Model Performance The high degree of sim-
+
+ilarity in vocabulary and script between these language pairs
+poses a significant challenge for the model. In cases where
+the input text is short or lacks clear contextual indicators, the
+model is prone to misclassifying one language for the other.
+This is particularly evident in texts containing commonly
+used words or phrases prevalent in both languages.
+
+(a) (b)
+
+FIGURE 14. Classification reports for the Romanized testing sets,
+including (a) XLM-Roberta and (b) SVM. The columns present labels for
+different languages, including Precision, Recall, F1-score, and support.
+The table also includes total accuracy, macro-average, and
+weighted-average performance metrics.
+
+C. ANALYSIS ON REAL-TIME DATA
+Testing a language model on real-time datasets is a critical
+process that assesses its performance and adaptability to dy-
+namic linguistic contexts. Real-time testing involves subject-
+ing themodel to diverse inputs, ranging from public grievance
+letters to administrative documents in different languages,
+often multilingual. This ensures it can effectively interpret
+and generate meaningful outputs across various domains. Our FIGURE 15. Error Analysis in Language Detection using Fine-Tuned XLM-
+
+Roberta Model. The "Target Language" column represents the true
+proposed pipeline has been tested on real-time data provided language of the sentence, and the "Predicted Language" column indicates
+by the National Informatics Center (NIC). The data contained the language predicted by the model. The model demonstrated a higher
+
+confusion rate specifically between Bengali and Assamese languages, as
+a total of 1600000 code-mixed sentences. The accuracy of our well as between Hindi and Marathi.
+proposed pipeline is 92.76%.
+
+VI. ERROR ANALYSIS VII. LIMITATIONS OF THE STUDY
+Overview of Error Analysis In language detection using the The XLM Roberta Native model attains the best accuracy as
+fine-tuned XLM-RoBERTa model, a notable challenge arises their training and testing data are mostly clean by remov-
+in differentiating closely related languages. Specifically, our ing noise like punctuation, special characters, and numbers.
+
+10 VOLUME 11, 2023
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Deyet al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+However, the XLMROBERTa Base Romanized data from the [8] Pavan, Kosuru, Niket Tandon, and Vasudeva Varma. Addressing challenges
+Aksharantar and Abhijanam datasets might be noisy due to a in automatic language identification of romanized text. In Proceedings
+
+of 8th International Conference on Natural Language Processing (ICON-
+mixed script. To solve this issue, better data is needed. This 2010) (2010).
+issue can degrade the performance of the XLM-ROBERTa [9] Digamberrao, Kale Sunil, and Rajesh S Prasad. Author identification using
+Base Romanized model as there is a lot of confusion between sequential minimal optimization with rule-based decision tree on Indian
+
+literature in Marathi. Procedia computer science 132 (2018): 1086-1101.
+all the 12 Indian languages. Elsevier
+
+[10] Gupta, Deepak Kumar, Shubham Kumar, and Asif Ekbal. "Machine learn-
+
+VIII. CONCLUSION AND FUTURE SCOPE ing approach for language identification & transliteration." In Proceed-
+ings of the 6th Annual Meeting of the Forum for Information Retrieval
+
+This paper proposes a novel pipeline including XLM Evaluation, pp. 60-64. 2014.
+ROBERTa Native and XLM ROBERTa Romanized. There [11] Bhaskaran, Sreebha, Geetika Paul, Deepa Gupta, and J Amudha. "Indian
+
+exist a few Indian Language identification baseline set for language identification for short text." In Advances in Computational
+Intelligence and Communication Technology: Proceedings of CICT 2019,
+
+XLM ROBERTa Native and XLM ROBERTa Romanized pp. 47-58. Springer, 2021.
+Model. However, our proposed BERT-based models outper- [12] Jha, Abhinav, and Hemprasad Yashwant Patil. "A review of machine
+
+form other machine learning models. This is because of the transliteration, translation, evaluation metrics and datasets in Indian Lan-
+guages." Multimedia Tools and Applications 82, no. 15 (2023): 23509-
+
+following reasons. Bert’s models made significant advance- 23540. Springer.
+ments in handling the out of vocabulary problem. These mod- [13] Yazar, Bılge Kağan, Durmuş Özkan Şahin, and Erdal Kiliç. "Low-Resource
+
+els use a sub-word tokenization scheme to convert the words Neural Machine Translation: A Systematic Literature Review." IEEE Ac-
+cess 11 (2023): 131775-131813. IEEE.
+
+into sub-words to produce the part of the unseen vocabulary. [14] Caswell, Isaac, Theresa Breiner, Daan van Esch, and Ankur Bapna. "Lan-
+These models capture contextual information. This model guage ID in the Wild: Unexpected Challenges on the Path to a Thousand-
+
+uses Masked Language Modelling to learn the text, a form of Language Web Text Corpus." In Proceedings of the 28th International
+Conference on Computational Linguistics, pp. 6588-6608. 2020.
+
+unsupervised learning. This pipeline can be used for various [15] Lui, Marco, and Timothy Baldwin. "Cross-domain feature selection for
+Natural Language Processing Problems. As the results for language identification." In Proceedings of 5th international joint confer-
+XLMROBERTa Romanized displayed, there can be a further ence on natural language processing, pp. 553-561. 2011.
+
+[16] Joulin, Armand, Edouard Grave, Piotr Bojanowski, Matthijs Douze, Hervé
+possibility for improvement in the performance. Jégou, and Tomas Mikolov. "Fasttext. zip: Compressing text classification
+
+models." arXiv preprint arXiv:1612.03651 (2016).
+
+IX. ACKNOWLEDGMENT [17] Costa-jussà, Marta R, James Cross, Onur Çelebi, Maha Elbayad, Ken-
+neth Heafield, Kevin Heffernan, Elahe Kalbassi et al. "No language left
+
+We sincerely thank the National Informatics Center (NIC), behind: Scaling human-centered machine translation." arXiv preprint
+operating under the Ministry of Electronics and Information arXiv:2207.04672 (2022).
+
+[18] Zhao, Yingjia, and Xin Tao. "ZYJ123@ DravidianLangTech-EACL2021:
+Technology, Government of India, for their generous funding Offensive language identification based on XLM-RoBERTa with DPCNN."
+that empowered this research. They also helped us by pro- In Proceedings of the first workshop on speech and language technologies
+viding real-time datasets and rigorous testing. Their support for dravidian languages, pp. 216-221. 2021.
+
+[19] Sai, Siva, and Yashvardhan Sharma. "Towards offensive language identi-
+has been instrumental in advancing our work in language fication for Dravidian languages." In Proceedings of the first workshop
+processing, contributing significantly to our understanding of on speech and language technologies for Dravidian languages, pp. 18-27.
+multilingual text recognition. NIC’s commitment to innova- 2021.
+
+tion and research excellence is sincerely appreciated. [20] Madhani, Yash, Mitesh M. Khapra, and Anoop Kunchukuttan. "Bhasa-
+Abhijnaanam: Native-script and romanized Language Identification for
+22 Indic languages." In Proceedings of the 61st Annual Meeting of the
+
+REFERENCES Association for Computational Linguistics (Volume 2: Short Papers), pp.
+816-826. Association for Computational Linguistics, 2023.
+
+[1] Lo Bianco, Joseph. The importance of language policies and multilin- [21] Chaitanya, Inumella, Indeevar Madapakula, Subham Kumar Gupta, and
+gualism for cultural diversity. International Social Science Journal 61.199 S Thara. "Word level language identification in code-mixed data using
+(2010): 37-67. word embedding methods for Indian languages." In 2018 International
+
+[2] Hanumanthappa, M, and M Narayana Swamy. A detailed study on Indian Conference on Advances in Computing, Communications and Informatics
+languages text mining. International Journal of Computer Science and (ICACCI), pp. 1137-1141. IEEE, 2018.
+Mobile Computing 3.11 (2014): 54-60. [22] Nakamura, Yukio. "Identification of languages with short sample texts. A
+
+[3] Khurana, Diksha, Aditya Koli, Kiran Khatter, and Sukhdev Singh. Natu- linguometric study." 1971.
+ral language processing: State of the art, current trends and challenges. [23] Cavnar, William B, and John M Trenkle. "N-gram-based text categoriza-
+Multimedia tools and applications 82.3 (2023): 3713-3744. Springer tion." In Proceedings of SDAIR-94, 3rd annual symposium on document
+
+[4] Hall, Kira, and Chad Nilep. Code-Switching, Identity, and Globalization. analysis and information retrieval, pp. 161175:14. Las Vegas, NV, 1994.
+The handbook of discourse analysis (2015): 597-619.Wiley Online Library [24] Poplack, Shana. "Sometimes i’ll start a sentence in spanish y termino
+
+[5] Baldwin, Timothy, and Marco Lui. Language identification: The long and en espanol: toward a typology of code-switching1." Walter de Gruyter,
+the short of the matter. In Proceedings of the 2010 annual conference of the Berlin/New York Berlin, New York, 1980.
+North American Chapter of the Association for Computational Linguistics, [25] Kalita, Nayan Jyoti, Ankita Goyal Agarwala, and Jayprakash Das. "Word
+pp. 229-237 (2010). level language identification on code-mixed english-bodo text." IOP Con-
+
+[6] Sefara, Tshephisho Joseph, Madimetja Jonas Manamela, and Promise ference Series: Materials Science and Engineering 1020, no. 1 (2021):
+TshepisoMalatji. Text-based language identification for some of the under- 012027. IOP Publishing.
+resourced languages of South Africa. In 2016 International Conference on [26] Lakshmi, BS Sowmya, and BR Shambhavi. "An automatic language iden-
+Advances in Computing and Communication Engineering (ICACCE), pp. tification system for code-mixed English-Kannada social media text." In
+303-307 (2016). IEEE 2017 2nd International conference on computational systems and informa-
+
+[7] Indhuja, K,M Indu, C Sreejith, Palakkad Sreekrishnapuram, and PCReghu tion technology for sustainable solution (CSITSS), pp. 1-5. IEEE, 2017.
+Raj. Text-based language identification system for Indian languages fol- [27] Soumya George, K, and Shibily Joseph. "Text classification by augmenting
+lowing Devanagiri script. International Journal of Engineering 3.4 (2014). bag of words (BOW) representation with co-occurrence feature." IOSR
+Citeseer Journal of Computer Engineering 16, no. 1 (2014): 34-38.
+
+VOLUME 11, 2023 11
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Dey et al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+[28] Liu, Cai-zhi, Yan-xiu Sheng, Zhi-qiang Wei, and Yong-Quan Yang. "Re- AKHILESH KANDWAL is currently working as
+search of text classification based on improved TF-IDF algorithm." In a Project Associate in Department of Computer
+2018 IEEE International Conference of Intelligent Robotic and Control Science and Engineering, Indian Institute of Tech-
+Engineering (IRCE), pp. 218-222. IEEE, 2018. nology (IIT), Roorkee, under the supervision of Dr.
+
+[29] Shekhar, Shashi, Dilip Kumar Sharma, and MM Sufyan Beg. "Language Partha Pratim Roy (IITR).
+identification framework in code-mixed social media text based on quan- He is mainly interested in the areas of deep
+tum LSTM—theword belongs to which language?"Modern Physics Letters learning, natural language processing, and brain-
+B 34, no. 06 (2020): 2050086. World Scientific. computer interfaces. Previously, he worked as a
+
+[30] Thara, S, and Prabaharan Poornachandran. "Transformer based language
+identification for Malayalam-English code-mixed text." IEEE Access 9 Project Associate at the CSIR-Central Scientific
+(2021): 118837-118850. IEEE. Instruments Organisation (CSIO), Chandigarh and
+
+[31] Kakwani, Divyanshu, Anoop Kunchukuttan, Satish Golla, NCGokul, Avik also gained experience as a Software Development Trainee at Sysnet Global
+Bhattacharyya, Mitesh M Khapra, and Pratyush Kumar. "IndicNLPSuite: Technologies Pvt Ltd, New Delhi.
+Monolingual corpora, evaluation benchmarks and pre-trainedmultilingual He holds a Bachelor of Technology degree in Electronics and Commu-
+language models for Indian languages." In Findings of the Association for nications Engineering from Graphic Era Deemed to be University (GEU),
+Computational Linguistics: EMNLP 2020, pp. 4948-4961. 2020. Dehradun.
+
+[32] Madhani, Yash, Sushane Parthan, Priyanka Bedekar, Ruchi Khapra, Vivek
+Seshadri, Anoop Kunchukuttan, Pratyush Kumar, and Mitesh M Khapra.
+"Aksharantar: Towards building open transliteration tools for the next bil-
+lion users." In Findings of the Association for Computational Linguistics:
+EMNLP 2023, pp. 40-57. 2023.
+
+[33] Wu, Yonghui, Mike Schuster, Zhifeng Chen, Quoc V Le, Mohammad
+Norouzi, Wolfgang Macherey, Maxim Krikun et al. "Google’s neural
+machine translation system: Bridging the gap between human and machine
+translation." arXiv preprint arXiv:1609.08144 (2016).
+
+[34] Sennrich, Rico, Barry Haddow, and Alexandra Birch. "Neural Machine
+Translation of RareWords with Subword Units." In Proceedings of the 54th
+Annual Meeting of the Association for Computational Linguistics (Volume
+1: Long Papers), pp. 1715-1725. 2016.
+
+[35] Vaswani, Ashish, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion
+Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. "Attention
+is all you need." Advances in neural information processing systems 30
+(2017). ROHIT KUMAR is working as Deputy Director
+
+[36] Liu, Yinhan, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi (IT) in National Informatics Centre, MEITY, New
+Chen, Omer Levy et al. "Roberta: A robustly optimized bert pre-training Delhi.
+approach." arXiv preprint arXiv:1907.11692 (2019). ‘‘ He completed his B.Tech. in Computer Sci-
+
+ence Engineering from SDDIET, Kurukshetra Uni-
+versity, India in 2014 with first class distinction
+and MTech in Information Security from Dr. B.R.
+Ambedkar National Institute of Technology, Ja-
+landhar, India in 2018 with gold medal.
+
+SAYANTAN DEY received the B.Tech. degree in His field of interests include Natural Language
+Electrical Engineering from St. Thomas’ College Processing and its applications for creating language models and chatbot
+of Engineering and Technology, Kolkata, India, in applications. He has worked on multiple projects related to judiciary, trans-
+2021. lation, transliteration and other eGovernance applications.
+
+He is currently working as a Project Associate
+at Parimal Lab, Department of Computer Science
+and Engineering, Indian Institute of Technology
+Roorkee (IITR), India, under the supervision of Dr.
+Partha Pratim Roy, focusing on Natural Language
+Processing.
+
+His research interests include data analytics, machine learning, deep learn-
+ing, computer vision, signal processing, and brain-computer interfaces. Prior
+to his current role, he was a Programmer Analyst Trainee at Cognizant.
+
+SHIVAM THAKUR As a Ph.D. student in the De-
+partment of Computer Science and Engineering at SHARMISTHA DASGUPTA is Deputy Director
+the Indian Institute of Technology Roorkee (IITR), General and group head for Centre of Excellence
+is under the supervision of Dr. Partha Pratim Roy, in Artificial Intelligence in National Informatics
+an Associate Professor in the Department. Centre, MEITY.
+
+His research focuses on the Natural Language She has completed Master of Computer Appli-
+Processing, Machine Learning, and Deep Learn- cations, from Birla Institute of Technology, Ranchi
+ing. and MTech in Computer Science and Engineering
+
+Shivam Thakur completed his B.Tech. from the from IIT Delhi.
+University Institute of Information Technology, She has extensive Field experience in eGover-
+
+Himachal Pradesh University, Shimla, in 2019, and his M.Tech. from Punjab nance Projects of Govt. Of India and her Interests
+Engineering College, Chandigarh, in 2022 include introducing AI and Deep Learning applications in Vision , Text,
+
+Speech to Mission Mode Projects and improving Citizen Centric Services.
+
+12 VOLUME 11, 2023
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+
+
+This article has been accepted for publication in IEEE Access. This is the author's version which has not been fully edited and 
+content may change prior to final publication. Citation information: DOI 10.1109/ACCESS.2024.3396290
+
+Sayantan Deyet al.: BharatBhasaNet-A unified framework to identify Indian code mix Languages
+
+DR. PARTHA PRATIM ROY(FELLOW OF IETE
+AND SENIOR MEMBER, IEEE) is presently
+working as an Associate Professor in the Depart-
+ment of Computer Science and Engineering, In-
+dian Institute of Technology (IIT), Roorkee. He
+received his Masters in 2006 and Ph.D. in 2010
+from Universitat Autonoma de Barcelona, Spain.
+He did postdoctoral stays in France and Canada
+from 2010 to 2013.
+
+Dr. Roy gathered industrial experience while
+working about 4 years in TCS and Samsung. In Samsung, he was a part-
+leader of the Computer Vision research team. He is the recipient of the "Best
+Student Paper" awarded by the International Conference on Document Anal-
+ysis and Recognition (ICDAR), 2009, Spain. He was listed in the Top 2%
+scientists by Stanford University in 2020 and 2021. He has published more
+than 250 research papers in various international journals, and conference
+proceedings.
+
+He has co-organized several international conferences and workshops, has
+been a member of the Program Committee of a number of international
+conferences, and acts as a reviewer formany journals in the field. His research
+interests include Pattern Recognition, Document Image Processing, Biomet-
+rics, and Human-Computer Interaction. He is presently serving as Associate
+Editor of IEEE Transactions on Circuits and Systems for Video Technol-
+ogy, ACM Transactions on Asian and Low-Resource Language Information
+Processing, IET Image Processing, IET Biometrics, IEICE Transactions on
+Information and Systems, and Springer Nature Computer Science. With
+his students, he has formed 2 start-ups funded by IIT Roorkee and other
+institutes.
+
+VOLUME 11, 2023 13
+
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License. For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/

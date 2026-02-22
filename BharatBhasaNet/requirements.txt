@@ -1,0 +1,35 @@
+# ==============================================================
+# BharatBhasaNet - Requirements
+# Install with: pip install -r requirements.txt
+# ==============================================================
+
+# Core ML / DL
+torch>=2.0.0
+transformers>=4.35.0
+datasets>=2.14.0
+accelerate>=0.24.0
+scikit-learn>=1.3.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Hugging Face utilities
+huggingface_hub>=0.17.0
+tokenizers>=0.14.0
+
+# Training optimizations
+evaluate>=0.4.0
+
+# Transliteration (AI4Bharat)
+ai4bharat-transliteration
+
+# Data download & handling
+requests>=2.31.0
+tqdm>=4.66.0
+openpyxl>=3.1.0
+
+# Visualization & analysis
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Utilities
+python-dotenv>=1.0.0

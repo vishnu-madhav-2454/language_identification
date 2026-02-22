@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Large data files
+BharatBhasaNet/data/raw/
+BharatBhasaNet/data/processed/
+
+# Model checkpoints (large binaries)
+BharatBhasaNet/models/
+
+# Training logs
+BharatBhasaNet/logs/
+
+# Keep directory structure placeholders
+!**/.gitkeep
+
+# HuggingFace cache
+.cache/
+*.cache
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Misc
+*.log
+*.tmp
