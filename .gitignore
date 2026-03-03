@@ -14,16 +14,26 @@ build/
 venv/
 env/
 ENV/
+indiclid_venv/
 
 # Large data files
 BharatBhasaNet/data/raw/
 BharatBhasaNet/data/processed/
+IndicLID/data/raw/
+IndicLID/data/processed/
 
 # Model checkpoints (large binaries)
 BharatBhasaNet/models/
+IndicLID/models/*.bin
+IndicLID/models/*.ftz
+IndicLID/models/indiclid_bert/
 
 # Training logs
 BharatBhasaNet/logs/
+IndicLID/logs/
+
+# PDF papers
+*.pdf
 
 # Keep directory structure placeholders
 !**/.gitkeep
